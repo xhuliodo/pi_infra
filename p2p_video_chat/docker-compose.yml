@@ -9,3 +9,7 @@ services:
     restart: unless-stopped
     networks:
       - proxy
+    labels:
+      - wud.watch=true
+      - wud.watch.digest=true
+      - wud.trigger.include=docker.latest,discord.deployments

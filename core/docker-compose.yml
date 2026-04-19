@@ -29,3 +29,19 @@ services:
       - portainer_data:/data
     networks:
       - proxy
+
+  wud:
+    image: getwud/wud:8.2
+    container_name: wud
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WUD_WATCHER_LOCAL_WATCHBYDEFAULT=false
+      - WUD_WATCHER_LOCAL_CRON=* * * * *
+      - WUD_TRIGGER_DOCKER_LATEST_PRUNE=true
+      - WUD_TRIGGER_DISCORD_DEPLOYMENTS_URL=${DISCORD_PI_HOOK}
+      - WUD_TRIGGER_DISCORD_DEPLOYMENTS_SIMPLETITLE=🚀 $${name} deployed!
+      - WUD_TRIGGER_DISCORD_DEPLOYMENTS_SIMPLEBODY=Updated from digest ...$${local.substring(56)} to ...$${remote.substring(56)}  
+    networks:
+      - proxy
