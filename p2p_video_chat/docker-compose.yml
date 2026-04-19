@@ -1,3 +1,7 @@
+networks:
+  proxy:
+    external: true
+
 services:
   p2p_video_chat_backend:
     image: ghcr.io/xhuliodo/p2p_video_chat_backend:latest
