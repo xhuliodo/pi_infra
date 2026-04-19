@@ -7,6 +7,9 @@ services:
     image: ghcr.io/xhuliodo/p2p_video_chat_backend:latest
     container_name: p2p_video_chat_backend
     restart: unless-stopped
+    environment:
+      - CLOUDFLARE_TURN_TOKEN_ID=${CLOUDFLARE_TURN_TOKEN_ID}
+      - CLOUDFLARE_API_TOKEN=${CLOUDFLARE_API_TOKEN}
     networks:
       - proxy
     labels:
