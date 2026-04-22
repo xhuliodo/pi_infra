@@ -1,0 +1,26 @@
+groups:
+  - name: stremio_albanian_subs_addon
+    rules:
+      - alert: UpTime
+        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
+        expr: time() - max by (name)
+          (container_last_seen{name="stremio_albanian_subs_addon"}) > 120
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container {{ $labels.name }} is down"
+          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
+            more than 2 minutes."
+
+  - name: p2p_video_chat_backend
+    rules:
+      - alert: UpTime
+        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
+        expr: time() - max by (name)
+          (container_last_seen{name="p2p_video_chat_backend"}) > 120
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container {{ $labels.name }} is down"
+          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
+            more than 2 minutes."

@@ -1,0 +1,30 @@
+{{ define "discord.title" -}}
+{{ if eq .Status "firing" }}🚨 FIRING{{ else }}💚 RESOLVED{{ end }} — {{ .CommonLabels.alertname }}
+{{- end }}
+
+{{ define "discord.message" -}}
+{{ range .Alerts }}
+{{ if eq .Status "firing" -}}
+
+**🔴 Container `{{ .Labels.name }}` is down.**
+
+{{ .Annotations.description }}
+
+**Labels:**
+{{ range .Labels.SortedPairs -}}
+  `{{ .Name }}` = `{{ .Value }}`
+{{ end }}
+**Started at:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+{{- else -}}
+
+**🟢 Container `{{ .Labels.name }}` is back up and running.**
+
+**Went down at:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
+**Resolved at:** {{ .EndsAt.Format "2006-01-02 15:04:05 UTC" }}
+
+
+{{- end }}
+---
+{{ if .GeneratorURL }}**[🔗 View in Prometheus]({{ .GeneratorURL }})**{{ end }}
+{{ end }}
+{{- end }}

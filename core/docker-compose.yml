@@ -1,6 +1,10 @@
 volumes:
   portainer_data:
     name: portainer_data
+  prometheus_data:
+    name: prometheus_data
+  alertmanager_data:
+    name: alertmanager_data
 
 networks:
   proxy:
@@ -29,6 +33,8 @@ services:
       - portainer_data:/data
     networks:
       - proxy
+    depends_on:
+      - cloudflared
 
   wud:
     image: getwud/wud:8.2
@@ -43,5 +49,58 @@ services:
       - WUD_TRIGGER_DISCORD_DEPLOYMENTS_URL=${DISCORD_PI_HOOK}
       - WUD_TRIGGER_DISCORD_DEPLOYMENTS_SIMPLETITLE=🚀 $${name} deployed!
       - WUD_TRIGGER_DISCORD_DEPLOYMENTS_SIMPLEBODY=Updated from digest ...$${local.substring(56)} to ...$${remote.substring(56)}  
+    networks:
+      - proxy
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    networks:
+      - proxy
+
+  prometheus:
+    image: prom/prometheus:v3
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - prometheus_data:/prometheus
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerts:/etc/prometheus/alerts:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=90d"
+      - "--web.external-url=https://prometheus.xhuliodo.xyz"
+    networks:
+      - proxy
+    depends_on:
+      - alertmanager
+      - cadvisor
+    
+  alertmanager:
+    image: prom/alertmanager:v0.32.0
+    container_name: alertmanager
+    restart: unless-stopped
+    ports:
+      - 9093:9093
+    volumes:
+      - alertmanager_data:/alertmanager
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ./alertmanager/templates:/etc/alertmanager/templates
+      - ./discord_webhook:/etc/alertmanager/secrets/discord_webhook:ro
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
     networks:
       - proxy

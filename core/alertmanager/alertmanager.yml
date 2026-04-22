@@ -1,0 +1,26 @@
+route:
+  receiver: "fallback"
+  group_by: [ "name" ]
+  group_wait: 5s
+  group_interval: 5s
+  repeat_interval: 2h
+  routes:
+    - matchers:
+        - alertname = "UpTime"
+      receiver: "discord_uptime"
+
+templates:
+  - "/etc/alertmanager/templates/*.tmpl"
+
+receivers:
+  - name: "fallback"
+    discord_configs:
+      - webhook_url_file: /etc/alertmanager/secrets/discord_webhook
+        send_resolved: false
+
+  - name: "discord_uptime"
+    discord_configs:
+      - webhook_url_file: /etc/alertmanager/secrets/discord_webhook
+        send_resolved: true
+        title: "{{ template \"discord.title\" . }}"
+        message: "{{ template \"discord.message\" . }}"
