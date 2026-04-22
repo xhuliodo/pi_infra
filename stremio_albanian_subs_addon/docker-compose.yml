@@ -1,0 +1,29 @@
+volumes:
+  stremio_albanian_subs_addon_data:
+    name: stremio_albanian_subs_addon_data
+
+networks:
+  proxy:
+    external: true
+
+services:
+  stremio_albanian_subs_addon:
+    image: ghcr.io/xhuliodo/stremio_albanian_subs_addon:latest
+    container_name: stremio_albanian_subs_addon
+    restart: on-failure:3
+    environment:
+      - USER_AGENT=${USER_AGENT}
+      - SUBSOURCE_API_KEY=${SUBSOURCE_API_KEY}
+      - SUB_DL_API_KEY=${SUB_DL_API_KEY}
+      - BATCH_SIZE=${BATCH_SIZE}
+      - AVG_LINE_PER_S=${AVG_LINE_PER_S}
+    volumes:
+      - stremio_albanian_subs_addon_data:/app/cache
+      - stremio_albanian_subs_addon_data:/app/logs
+    networks:
+      - proxy
+    labels:
+      - wud.watch=true
+      - wud.watch.digest=true
+      - wud.trigger.include=docker.latest,discord.deployments
+
