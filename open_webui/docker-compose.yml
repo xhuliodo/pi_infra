@@ -1,0 +1,19 @@
+volumes:
+  open_webui:
+    name: open_webui
+
+services:
+  open_webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open_webui
+    restart: on-failure:3
+    volumes:
+      - open_webui:/app/backend/data
+    environment:
+      - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
+    networks:
+      - proxy
+    labels:
+      - wud.watch=true
+      - wud.watch.digest=true
+      - wud.trigger.include=docker.latest,discord.deployments
