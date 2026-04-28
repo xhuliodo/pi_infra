@@ -5,6 +5,8 @@ networks:
 volumes:
   open_webui:
     name: open_webui
+  searxng_data:
+    name: searxng_data
 
 services:
   open_webui:
@@ -17,6 +19,22 @@ services:
       - WEBUI_SECRET_KEY=${WEBUI_SECRET_KEY}
     networks:
       - proxy
+    labels:
+      - wud.watch=true
+      - wud.watch.digest=true
+      - wud.trigger.include=docker.latest,discord.deployments
+  searxng:
+    image: ghcr.io/searxng/searxng:latest
+    container_name: searxng
+    restart: unless-stopped
+    networks:
+      - proxy
+    volumes:
+      - searxng_data:/etc/searxng
+      - searxng_data:/var/cache/searxng/
+    environment:
+      - SEARXNG_SECRET=${SEARXNG_SECRET_KEY}
+      - SEARXNG_BASE_URL=http://searxng:8080/
     labels:
       - wud.watch=true
       - wud.watch.digest=true
