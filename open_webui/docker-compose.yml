@@ -1,3 +1,7 @@
+networks:
+  proxy:
+    external: true
+
 volumes:
   open_webui:
     name: open_webui
