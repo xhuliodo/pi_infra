@@ -1,6 +1,8 @@
 volumes:
   stremio_albanian_subs_addon_data:
     name: stremio_albanian_subs_addon_data
+  stremio_albanian_subs_addon_logs:
+    name: stremio_albanian_subs_addon_logs
 
 networks:
   proxy:
@@ -19,7 +21,7 @@ services:
       - AVG_LINE_PER_S=${AVG_LINE_PER_S}
     volumes:
       - stremio_albanian_subs_addon_data:/app/cache
-      - stremio_albanian_subs_addon_data:/app/logs
+      - stremio_albanian_subs_addon_logs:/app/logs
     networks:
       - proxy
     labels:
