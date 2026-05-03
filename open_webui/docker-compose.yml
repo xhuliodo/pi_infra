@@ -7,6 +7,8 @@ volumes:
     name: open_webui
   searxng_data:
     name: searxng_data
+  searxng_cache:
+    name: searxng_cache
 
 services:
   open_webui:
@@ -26,12 +28,12 @@ services:
   searxng:
     image: ghcr.io/searxng/searxng:latest
     container_name: searxng
-    restart: unless-stopped
+    restart: on-failure:3
     networks:
       - proxy
     volumes:
       - searxng_data:/etc/searxng
-      - searxng_data:/var/cache/searxng/
+      - searxng_cache:/var/cache/searxng/
     environment:
       - SEARXNG_SECRET=${SEARXNG_SECRET_KEY}
       - SEARXNG_BASE_URL=http://searxng:8080/

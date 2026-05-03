@@ -24,3 +24,29 @@ groups:
           summary: "Container {{ $labels.name }} is down"
           description: "Container {{ $labels.name }} has not been seen by cAdvisor for
             more than 2 minutes."
+
+  - name: open_webui
+    rules:
+      - alert: UpTime
+        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
+        expr: time() - max by (name)
+          (container_last_seen{name="open_webui"}) > 120
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container {{ $labels.name }} is down"
+          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
+            more than 2 minutes."
+  
+  - name: searxng
+    rules:
+      - alert: UpTime
+        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
+        expr: time() - max by (name)
+          (container_last_seen{name="searxng"}) > 120
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container {{ $labels.name }} is down"
+          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
+            more than 2 minutes."
