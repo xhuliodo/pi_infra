@@ -70,7 +70,9 @@ services:
     command: redis-server --bind 0.0.0.0
 
   firecrawl-postgres:
-    image: postgres:16-alpine
+    build:
+      context: .
+      dockerfile: nuq.Dockerfile
     container_name: firecrawl-postgres
     restart: on-failure:3
     networks:
