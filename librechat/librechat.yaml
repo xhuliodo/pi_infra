@@ -21,4 +21,5 @@ webSearch:
   firecrawlApiUrl: "${FIRECRAWL_API_URL}"
   firecrawlApiKey: "${FIRECRAWL_API_KEY}"
 
-  rerankerType: "none"
+  rerankerType: "cohere"
+  cohereApiKey: "${COHERE_API_KEY}"
