@@ -1,0 +1,98 @@
+volumes:
+  searxng_data:
+    name: searxng_data
+  searxng_cache:
+    name: searxng_cache
+
+networks:
+  proxy:
+    external: true
+
+services:
+
+  # new services
+  searxng:
+    image: ghcr.io/searxng/searxng:latest
+    container_name: searxng
+    restart: on-failure:3
+    networks:
+      - proxy
+    volumes:
+      - searxng_data:/etc/searxng
+      - searxng_cache:/var/cache/searxng/
+    environment:
+      - SEARXNG_SECRET=${SEARXNG_SECRET_KEY}
+      - SEARXNG_BASE_URL=${SEARXNG_INSTANCE_URL}
+
+  # Firecrawl
+  firecrawl:
+    image: ghcr.io/firecrawl/firecrawl:latest
+    container_name: firecrawl
+    restart: on-failure:3
+    networks:
+      - proxy
+    environment:
+      - REDIS_URL=redis://firecrawl-redis:6379
+      - REDIS_RATE_LIMIT_URL=redis://firecrawl-redis:6379
+      - PLAYWRIGHT_MICROSERVICE_URL=http://firecrawl-playwright:3000/scrape
+      - PORT=3002
+      - HOST=0.0.0.0
+      - USE_DB_AUTHENTICATION=false
+      - NUM_WORKERS_PER_QUEUE=8
+    depends_on:
+      firecrawl-redis:
+        condition: service_started
+      firecrawl-playwright:
+        condition: service_started
+    command: node dist/src/harness.js --start-docker
+
+  firecrawl-playwright:
+    image: ghcr.io/firecrawl/playwright-service:latest
+    container_name: firecrawl-playwright
+    restart: on-failure:3
+    networks:
+      - proxy
+    environment:
+      - PORT=3000
+
+  firecrawl-redis:
+    image: redis:alpine
+    container_name: firecrawl-redis
+    restart: on-failure:3
+    networks:
+      - proxy
+    command: redis-server --bind 0.0.0.0
+
+
+  # override older
+  api:
+    image: registry.librechat.ai/danny-avila/librechat:latest
+    volumes:
+    - type: bind
+      source: ./librechat.yaml
+      target: /app/librechat.yaml
+    ports: []
+    restart: on-failure:3
+    networks:
+      - proxy
+  
+  mongodb:
+    restart: on-failure:3
+    networks:
+      - proxy
+
+  meilisearch:
+    restart: on-failure:3
+    networks:
+      - proxy
+
+  vectordb:
+    restart: on-failure:3
+    networks:
+      - proxy
+
+  rag_api:
+    restart: on-failure:3
+    networks:
+      - proxy
+
