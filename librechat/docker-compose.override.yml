@@ -3,10 +3,6 @@ volumes:
     name: searxng_data
   searxng_cache:
     name: searxng_cache
-  firecrawl_pgdata:
-    name: firecrawl_pgdata
-  firecrawl_rabbitmq_data:
-    name: firecrawl_rabbitmq_data
 
 networks:
   proxy:
@@ -27,80 +23,6 @@ services:
     environment:
       - SEARXNG_SECRET=${SEARXNG_SECRET_KEY}
       - SEARXNG_BASE_URL=${SEARXNG_INSTANCE_URL}
-
-  # Firecrawl
-  firecrawl:
-    image: ghcr.io/firecrawl/firecrawl:latest
-    container_name: firecrawl
-    restart: on-failure:3
-    networks:
-      - proxy
-    environment:
-      - NUQ_DATABASE_URL=postgresql://firecrawl:firecrawl@firecrawl-postgres:5432/firecrawl_nuq
-      - NUQ_RABBITMQ_URL=amqp://firecrawl:firecrawl@firecrawl-rabbitmq:5672
-      - REDIS_URL=redis://firecrawl-redis:6379
-      - REDIS_RATE_LIMIT_URL=redis://firecrawl-redis:6379
-      - PLAYWRIGHT_MICROSERVICE_URL=http://firecrawl-playwright:3000/scrape
-      - PORT=3002
-      - HOST=0.0.0.0
-      - USE_DB_AUTHENTICATION=false
-      - NUM_WORKERS_PER_QUEUE=8
-    depends_on:
-      firecrawl-redis:
-        condition: service_started
-      firecrawl-playwright:
-        condition: service_started
-    command: node dist/src/harness.js --start-docker
-
-  firecrawl-playwright:
-    image: ghcr.io/firecrawl/playwright-service:latest
-    container_name: firecrawl-playwright
-    restart: on-failure:3
-    networks:
-      - proxy
-    environment:
-      - PORT=3000
-
-  firecrawl-redis:
-    image: redis:alpine
-    container_name: firecrawl-redis
-    restart: on-failure:3
-    networks:
-      - proxy
-    command: redis-server --bind 0.0.0.0
-
-  firecrawl-postgres:
-    build:
-      context: .
-      dockerfile: nuq.Dockerfile
-    container_name: firecrawl-postgres
-    restart: on-failure:3
-    networks:
-      - proxy
-    environment:
-      - POSTGRES_USER=firecrawl
-      - POSTGRES_PASSWORD=firecrawl
-      - POSTGRES_DB=firecrawl_nuq
-    volumes:
-      - firecrawl_pgdata:/var/lib/postgresql/data
-
-  firecrawl-rabbitmq:
-    image: rabbitmq:4.0-alpine
-    container_name: firecrawl-rabbitmq
-    restart: on-failure:3
-    networks:
-      - proxy
-    environment:
-      - RABBITMQ_DEFAULT_USER=firecrawl
-      - RABBITMQ_DEFAULT_PASS=firecrawl
-    volumes:
-      - firecrawl_rabbitmq_data:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
-      interval: 5s
-      timeout: 5s
-      retries: 10   
-
 
   # override older
   api:
