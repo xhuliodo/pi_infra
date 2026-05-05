@@ -1,7 +1,7 @@
 groups:
-  - name: Uptime
+  - name: UpTime
     rules:
-      - alert: Uptime
+      - alert: UpTime
         expr: probe_success{job="blackbox_tcp"} == 0
         for: 2m
         labels:
