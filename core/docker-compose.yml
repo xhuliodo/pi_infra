@@ -55,23 +55,6 @@ services:
     networks:
       - proxy
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.55.1
-    container_name: cadvisor
-    restart: unless-stopped
-    privileged: true
-    volumes:
-      - /:/rootfs:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /dev/disk/:/dev/disk:ro
-    devices:
-      - /dev/kmsg
-    networks:
-      - proxy
-
   prometheus:
     image: prom/prometheus:v3
     container_name: prometheus
@@ -89,7 +72,17 @@ services:
       - proxy
     depends_on:
       - alertmanager
-      - cadvisor
+      - blackbox_exporter
+
+  blackbox_exporter:
+    image: prom/blackbox-exporter:v0.28.0
+    container_name: blackbox_exporter
+    restart: unless-stopped
+    volumes:
+      - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml
+    command: --config.file=/etc/blackbox_exporter/config.yml
+    networks:
+      - proxy
     
   alertmanager:
     image: prom/alertmanager:v0.32.0

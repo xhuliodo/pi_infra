@@ -1,52 +1,11 @@
 groups:
-  - name: stremio_albanian_subs_addon
+  - name: Uptime
     rules:
-      - alert: UpTime
-        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
-        expr: time() - max by (name)
-          (container_last_seen{name="stremio_albanian_subs_addon"}) > 120
+      - alert: Uptime
+        expr: probe_success{job="blackbox_tcp"} == 0
+        for: 2m
         labels:
           severity: critical
         annotations:
-          summary: "Container {{ $labels.name }} is down"
-          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
-            more than 2 minutes."
-
-  - name: p2p_video_chat_backend
-    rules:
-      - alert: UpTime
-        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
-        expr: time() - max by (name)
-          (container_last_seen{name="p2p_video_chat_backend"}) > 120
-        labels:
-          severity: critical
-        annotations:
-          summary: "Container {{ $labels.name }} is down"
-          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
-            more than 2 minutes."
-
-  - name: open_webui
-    rules:
-      - alert: UpTime
-        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
-        expr: time() - max by (name)
-          (container_last_seen{name="open_webui"}) > 120
-        labels:
-          severity: critical
-        annotations:
-          summary: "Container {{ $labels.name }} is down"
-          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
-            more than 2 minutes."
-  
-  - name: searxng
-    rules:
-      - alert: UpTime
-        # keep the seconds integer as a multiple of "evaluation_interval" in prometheus conf
-        expr: time() - max by (name)
-          (container_last_seen{name="searxng"}) > 120
-        labels:
-          severity: critical
-        annotations:
-          summary: "Container {{ $labels.name }} is down"
-          description: "Container {{ $labels.name }} has not been seen by cAdvisor for
-            more than 2 minutes."
+          summary: "{{ $labels.instance }} is DOWN"
+          description: "Blackbox has not been able to reach: {{ $labels.instance }} for over 2 min."

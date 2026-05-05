@@ -1,6 +1,6 @@
 route:
   receiver: "fallback"
-  group_by: [ "name" ]
+  group_by: [ "alertname", "instance" ]
   group_wait: 5s
   group_interval: 5s
   repeat_interval: 2h

@@ -6,7 +6,7 @@
 {{ range .Alerts }}
 {{ if eq .Status "firing" -}}
 
-**🔴 Container `{{ .Labels.name }}` is down.**
+**🔴 Container `{{ .Labels.instance }}` is down.**
 
 {{ .Annotations.description }}
 
@@ -17,7 +17,7 @@
 **Started at:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
 {{- else -}}
 
-**🟢 Container `{{ .Labels.name }}` is back up and running.**
+**🟢 Container `{{ .Labels.instance }}` is back up and running.**
 
 **Went down at:** {{ .StartsAt.Format "2006-01-02 15:04:05 UTC" }}
 **Resolved at:** {{ .EndsAt.Format "2006-01-02 15:04:05 UTC" }}

@@ -17,7 +17,19 @@ scrape_configs:
       - targets:
           - stremio_albanian_subs_addon:8000
 
-  - job_name: cadvisor
+  - job_name: "blackbox_tcp"
+    metrics_path: /probe
+    params:
+      module: [ tcp_connect ]
     static_configs:
       - targets:
-          - "cadvisor:8080"
+          - "stremio_albanian_subs_addon:8000"
+          - "p2p_video_chat_backend:80"
+          - "searxng:8080"
+    relabel_configs:
+      - source_labels: [ __address__ ]
+        target_label: __param_target
+      - source_labels: [ __param_target ]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox_exporter:9115
