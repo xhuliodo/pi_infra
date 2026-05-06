@@ -1,0 +1,41 @@
+networks:
+  proxy:
+    external: true
+
+services:
+  # override older
+  playwright-service:
+    restart: on-failure:3
+    networks:
+      proxy:
+        aliases:
+          - firecrawl-playwright-service
+
+  api:
+    restart: on-failure:3
+    ports: []
+    networks:
+      proxy:
+        aliases:
+          - firecrawl-api
+  
+  redis:
+    restart: on-failure:3
+    networks:
+      proxy:
+        aliases:
+          - firecrawl-redis
+
+  rabbitmq:
+    restart: on-failure:3
+    networks:
+      proxy:
+        aliases:
+          - firecrawl-rabbitmq
+
+  nuq-postgres:
+    restart: on-failure:3
+    networks:
+      proxy:
+        aliases:
+          - firecrawl-nuq-postgres
