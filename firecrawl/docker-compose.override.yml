@@ -13,7 +13,7 @@ services:
 
   api:
     restart: on-failure:3
-    ports: []
+    ports: !override []
     networks:
       proxy:
         aliases:

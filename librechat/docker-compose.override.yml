@@ -32,7 +32,7 @@ services:
     - type: bind
       source: ./librechat.yaml
       target: /app/librechat.yaml
-    ports: []
+    ports: !override []
     restart: on-failure:3
     networks:
       - proxy
