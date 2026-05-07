@@ -78,6 +78,9 @@ services:
     image: prom/blackbox-exporter:v0.28.0
     container_name: blackbox_exporter
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
     volumes:
       - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml
     command: --config.file=/etc/blackbox_exporter/config.yml

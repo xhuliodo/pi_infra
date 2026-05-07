@@ -2,7 +2,7 @@ groups:
   - name: UpTime
     rules:
       - alert: UpTime
-        expr: probe_success{job="blackbox_tcp"} == 0
+        expr: probe_success{job=~"blackbox_tcp|blackbox_http"} == 0
         for: 2m
         labels:
           severity: critical

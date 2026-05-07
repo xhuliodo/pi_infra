@@ -12,10 +12,24 @@ rule_files:
   - /etc/prometheus/alerts/*.yml
 
 scrape_configs:
-  - job_name: stremio_albanian_subs_addon
+
+  # this is kind of a workaround to test cloudflared tunnels
+  # since I can't test it against cloudflared locally
+  - job_name: "blackbox_http"
+    metrics_path: /probe
+    params:
+      module: [ http_2xx ]
     static_configs:
       - targets:
-          - stremio_albanian_subs_addon:8000
+          - "https://stremio-albanian-subs-addon.xhuliodo.xyz/manifest.json"
+        labels:
+          project: core
+          instance: "cloudflared"
+    relabel_configs:
+    - source_labels: [__address__]
+      target_label: __param_target
+    - target_label: __address__
+      replacement: blackbox_exporter:9115
 
   - job_name: "blackbox_tcp"
     metrics_path: /probe
@@ -23,13 +37,42 @@ scrape_configs:
       module: [ tcp_connect ]
     static_configs:
       - targets:
+          - "portainer:9000"
+          - "wud:3000"
+        labels:
+          project: "core"
+
+      - targets:
           - "stremio_albanian_subs_addon:8000"
           - "p2p_video_chat_backend:80"
+        labels: 
+          project: "xhuliodo"
+      
+      - targets:
+          - "librechat:3080"
+          - "chat-meilisearch:7700"
+          - "chat-mongodb:27017"
+          - "rag_api:8000"
           - "searxng:8080"
+          - "vectordb:5432"
+          - "firecrawl-api:3002"
+          - "firecrawl-playwright-service:3000"
+          - "firecrawl-redis:6379"
+          - "firecrawl-rabbitmq:5672"
+          - "firecrawl-nuq-postgres:5432"
+        labels: 
+          project: "librechat"
     relabel_configs:
       - source_labels: [ __address__ ]
         target_label: __param_target
-      - source_labels: [ __param_target ]
-        target_label: instance
+      - source_labels: [__param_target]
+          target_label: instance
+          regex: '(.+):\d+'
+          replacement: '$1'
       - target_label: __address__
         replacement: blackbox_exporter:9115
+
+  - job_name: stremio_albanian_subs_addon
+    static_configs:
+      - targets:
+          - stremio_albanian_subs_addon:8000
