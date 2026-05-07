@@ -20,7 +20,7 @@ webSearch:
   scraperProvider: "firecrawl"
   firecrawlApiUrl: "${FIRECRAWL_API_URL}"
   firecrawlApiKey: "${FIRECRAWL_API_KEY}"
-  scraperTimeout: 30000
+  scraperTimeout: 60000
 
   rerankerType: "cohere"
   cohereApiKey: "${COHERE_API_KEY}"
