@@ -27,7 +27,7 @@ services:
 
   # override older
   api:
-    image: registry.librechat.ai/danny-avila/librechat:latest
+    image: registry.librechat.ai/danny-avila/librechat:v0.8.6-rc1
     volumes:
     - type: bind
       source: ./librechat.yaml

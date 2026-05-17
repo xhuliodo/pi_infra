@@ -22,5 +22,5 @@ webSearch:
   firecrawlApiKey: "${FIRECRAWL_API_KEY}"
   scraperTimeout: 60000
 
-  rerankerType: "cohere"
-  cohereApiKey: "${COHERE_API_KEY}"
+  rerankerType: "none"
+  # cohereApiKey: "${COHERE_API_KEY}"
